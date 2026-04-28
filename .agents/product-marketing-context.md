@@ -4,10 +4,20 @@
 
 ## Product Overview
 **One-liner:** Plakar is the open-source standard for unified resilience — backup anything, store anywhere, with zero-trust encryption and no vendor lock-in.
-**What it does:** Plakar is an open-source backup and restore platform built around Kloset, a self-contained immutable snapshot engine that performs client-side deduplication and encryption before data leaves the source. Data is stored in an open, portable PTAR format across any backend (S3, SFTP, local disk, cloud). Plakar Enterprise adds a unified control plane for posture management, compliance, and MSP delegation via the Vault Protocol.
 **Product category:** Data Resilience / Backup & Recovery (enterprise infrastructure + security)
-**Product type:** Open-source core (free, self-hosted) + commercial Enterprise control plane
-**Business model:** Open-source adoption engine → Plakar Enterprise licensing (usage-based, indexed on secured data volume). Future: licensing Vault Server technology to MSPs/service providers.
+**Product type:** Open-source core (free, self-hosted) + commercial Control Plane
+**Business model:** Open-source adoption engine → Plakar Control Plane licensing (usage-based, indexed on secured data volume; free up to a defined storage capacity). Future: licensing Vault Server technology to MSPs/service providers.
+
+### Product Architecture (three layers)
+
+**Kloset** — The open, high-density storage layer: portable, tamper-evident, and cryptographically sealed across time.
+Kloset is the foundation of the Plakar ecosystem. It defines how data is stored, verified, and preserved, independently of where it physically resides. The format is open, documented, and fully auditable — any party can read, validate, or recover a Kloset without depending on a vendor, a license, or a proprietary tool. Architecture: content-addressable chunking, source-side deduplication, cryptographic sealing. Every block is identified by its hash, every snapshot carries a verifiable signature, every write is append-only. Achieves deduplication ratios close to 100:1 on typical enterprise datasets while guaranteeing any alteration can be detected immediately. Klosets live on any backend (S3, NAS, SFTP, tape, local disk) and move between them without transformation.
+
+**Plakar** — The open-source suite that captures any data source into a portable Kloset, for backup, replication, and instant restore.
+Plakar is the application layer on top of Kloset. Three operational promises: (1) Backup — captures any data source with client-side encryption and source-side deduplication, so only unique encrypted chunks ever leave the environment; (2) Replication — moves Klosets between locations with full integrity guarantees, enabling cross-region, cross-cloud, and cross-storage strategies; (3) Restore — granular and immediate: browse, search, or query a snapshot without a full restore, turning recovery from a multi-hour operation into a targeted action measured in seconds.
+
+**Plakar Control Plane** — The centralized platform that aligns resilience with business criticality, orchestrating protection, posture, and visibility across every cloud and environment.
+The cockpit from which resilience becomes a business-aligned discipline rather than an infrastructure chore. Teams define the resilience SLA each resource actually requires (recovery time, recovery point, retention, verification frequency) based on environment and criticality — the platform enforces those commitments everywhere, continuously. Connects to existing inventories (VMs, Kubernetes clusters, cloud provider resources, on-premise assets) and lifts them into a single protection perimeter. Operates uniformly across clouds: some sources reached via native APIs, others via a lightweight Plakar instance deployed close to them. Granular access control at the Kloset level — precise boundaries around who can access which data. Delivered as a ready-to-deploy virtual appliance; free up to a defined storage capacity. Native Kubernetes operator makes resilience declarative, versionable, and GitOps-friendly. Acts as a pilot layer, not a lock-in layer — data stays under full organizational control, readable and recoverable outside the platform.
 
 ## Target Audience
 **Target companies:** 500–5,000 employees, $50M+ revenue; Finance (compliance/audit), Healthcare (HIPAA), Tech & Cloud Providers, Legal, Scale-ups; Europe (GDPR), North America (HIPAA/SOC2)
@@ -115,11 +125,14 @@
 **Glossary:**
 | Term | Meaning |
 |------|---------|
-| Kloset | Plakar's core snapshot engine — performs client-side dedup + encryption in a single pass |
+| Kloset | The open storage layer — content-addressable, append-only, cryptographically sealed; the portable snapshot format at the foundation of Plakar |
 | PTAR | Open, portable archive format used to store Kloset snapshots |
+| Plakar | The open-source application suite that captures any data source into a Kloset (backup, replication, restore) |
+| Plakar Control Plane | The commercial control plane — aligns resilience with business criticality; unified posture, orchestration, and visibility; free up to a defined storage capacity |
 | Vault Protocol | Zero-knowledge delegation protocol enabling MSPs to operate backup without holding customer keys |
 | Backup Posture Management | Unified visibility layer showing protected vs. unprotected assets across all environments |
 | Index-in-snapshot | Architecture where the backup index lives inside each snapshot, not in a central catalog database |
+| Five Pillars | Plakar's resilience framework: Visibility, Integrity, Isolation, Usability, Sovereignty |
 
 ## Brand Voice
 **Tone:** Rigorous, engineer-first, security-minded; confident without arrogance; precise without dryness
@@ -145,6 +158,54 @@
 | Scale without limits | Index-in-snapshot; no catalog collapse; petabyte-scale linear performance |
 | Open & auditable | PTAR/Kloset open-source; CNCF Silver Member; publicly audited cryptography |
 | Instant recovery | Mount terabytes as filesystem; single file in seconds |
+
+## Market Narrative — The Arithmetic of Defence
+*Use this as the strategic backdrop for all messaging. It explains why backup is no longer boring.*
+
+Three forces have converged to break legacy backup:
+1. **Attacker industrialisation** — Ransomware operators run professional businesses. AI has collapsed their cost of production. An attack that used to require a team of specialists now takes a fraction of the effort. Corporate defence budgets have not moved. At this ratio, almost every external perimeter is porous — a question of arithmetic, not posture.
+2. **The internal perimeter is pressured from two new directions** — The software supply chain has never been younger: dependencies multiply faster than they can be audited, carrying bugs and backdoors deep in the stack. AI agents are bold operators: higher risk tolerance than humans, acting on data directly, faster than anyone can trace.
+3. **Data and infrastructure have changed shape** — AI has made datasets grow far faster than before (models, logs, embeddings, autonomous system exhaust). Hundreds of terabytes where laptops used to suffice. Most backup tools were designed for a world where the index could live in RAM — they will silently fail at the exact moment they are needed. Infrastructure is now defined by code, spun up and torn down on demand. Kubernetes clusters scale from ten nodes to a thousand between deployments. Protection models built for stable fleets cannot follow polymorphic workloads.
+
+**The conclusion:** Backup used to be the boring part of the job. That assumption is what attackers bet on, what AI systems silently break, and what sheer volume and polymorphic infrastructure make untenable. It is now the last place where the truth of the data still exists, and often the only place from which a business can be rebuilt.
+
+**What this demands from backup:**
+- Frequent enough to roll back hours, not days
+- Encrypted end-to-end (ransomware attacks backup systems first)
+- Verifiable — a backup you cannot prove intact is already lost
+- Scalable without collapsing under its own index
+- Follows workloads that no longer stay in one place
+- Lives somewhere an attacker cannot reach with production credentials
+- Granular to a single file, row, or configuration — in seconds
+- In an open format, on infrastructure you control, readable without vendor permission
+
+## Five Pillars of Resilience
+*Use as a qualification framework and sales tool. Each pillar maps to Plakar capabilities.*
+
+**1. Visibility** — Know what exists, know what is protected, in real time.
+- Every production workload inventoried automatically, without manual registration
+- Dashboard shows exact coverage gap between declared and protected perimeter in real time
+- New Kubernetes namespaces, cloud accounts, and SaaS tenants inherit a protection policy by default
+
+**2. Integrity** — Capture the truth, and prove it has not changed since.
+- Every snapshot carries a cryptographic signature enabling tamper detection
+- Restore tests run automatically with logged results (not occasional manual exercises)
+- System can identify the last known-good version of any dataset before silent corruption started
+
+**3. Isolation** — Keep the backup out of reach of the threats it is supposed to survive.
+- Backups encrypted client-side, before leaving the source environment
+- Backup system access uses credentials distinct and independent from production credentials
+- Full compromise of the production environment does not grant access to backups
+
+**4. Usability** — Make the backup useful, not just existing. Fast, granular, searchable.
+- Single file, database row, or configuration retrievable from any snapshot in seconds
+- Snapshots browsable and queryable without a full restore
+- Scales to hundreds of terabytes without collapsing under its own index
+
+**5. Sovereignty** — Depend on no single vendor, no single provider, no single format.
+- Backups stored in a documented, open format readable without the original tool
+- Leaving the current provider would not require data migration, transformation, or renegotiation
+- Backup strategy does not stack a new dependency on top of the systems it is meant to protect
 
 ## Goals
 **Business goal:** Establish Plakar as the open-source standard for enterprise backup, then convert regulated enterprises to Plakar Enterprise for unified posture management
